@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Bầu Cử Lớp - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗳️ Hệ Thống Bầu Cử Lớp Online</h1>
+            <p class="subtitle">Dựa trên công nghệ Blockchain - Minh bạch & Bảo mật</p>
+            
+            <!-- Thông tin người dùng -->
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-details">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-text">
+                        <h3 id="userName">-</h3>
+                        <p id="userRole">-</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- Thông tin kết nối -->
+        <div class="connection-status" id="connectionStatus">
+            <div class="status-item">
+                <span>Trạng thái:</span>
+                <span id="statusText" class="status-disconnected">Chưa kết nối</span>
+            </div>
+            <div class="status-item">
+                <span>Địa chỉ ví:</span>
+                <span id="accountAddress">Chưa kết nối</span>
+            </div>
+            <div class="status-item">
+                <span>Vai trò:</span>
+                <span id="userRole2">-</span>
+            </div>
+        </div>
+
+        <button id="connectWallet" class="btn btn-primary btn-large">Kết nối MetaMask</button>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="tabs">
+            <button class="tab-button active" data-tab="voting">Bỏ Phiếu</button>
+            <button class="tab-button" data-tab="results">Kết Quả</button>
+            <button class="tab-button" data-tab="registration">Đăng Ký Ứng Viên</button>
+            <button class="tab-button admin-only" data-tab="admin">Quản Trị</button>
+        </div>
+
+        <!-- Voting Tab -->
+        <div class="tab-content active" id="voting">
+            <div class="section">
+                <h2>🎯 Thông Tin Bầu Cử</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Trạng thái bầu cử</h3>
+                        <p id="electionState" class="state-text">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Số ứng viên</h3>
+                        <p id="candidateCount" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Tổng số phiếu</h3>
+                        <p id="totalVotes" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Trạng thái của bạn</h3>
+                        <p id="voterStatus" class="status-text">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>👥 Danh Sách Ứng Viên</h2>
+                <div id="candidatesList" class="candidates-list">
+                    <p class="empty-state">Chưa có ứng viên nào</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div class="tab-content" id="results">
+            <div class="section">
+                <h2>📊 Kết Quả Bầu Cử</h2>
+                <button id="refreshResults" class="btn btn-secondary">Làm mới kết quả</button>
+                <div id="resultsList" class="results-list">
+                    <p class="empty-state">Chưa có kết quả</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Tab -->
+        <div class="tab-content" id="registration">
+            <div class="section">
+                <h2>📝 Đăng Ký Ứng Viên</h2>
+                <p class="description">Đăng ký tham gia ứng cử vào ban cán sự lớp</p>
+                
+                <form id="candidateForm" class="form">
+                    <div class="form-group">
+                        <label for="candidateName">Họ và tên:</label>
+                        <input type="text" id="candidateName" placeholder="Nhập họ tên đầy đủ" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="candidatePosition">Vị trí ứng cử:</label>
+                        <select id="candidatePosition" required>
+                            <option value="">-- Chọn vị trí --</option>
+                            <option value="Lop truong">Lớp trưởng</option>
+                            <option value="Lop pho">Lớp phó</option>
+                            <option value="Bi thu">Bí thư</option>
+                            
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Đăng ký ứng cử</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div class="tab-content admin-only" id="admin">
+            <div class="section">
+                <h2>⚙️ Quản Trị Hệ Thống</h2>
+                <p>Chức năng quản trị dành cho admin</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 - Hệ Thống Bầu Cử Lớp Blockchain | Phát triển với Ethereum & Solidity</p>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <!-- Scripts - Không load Web3 để tránh lỗi -->
+    <script src="auth.js"></script>
+    <script>
+        // Simple version without Web3
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                checkAuth();
+                initializeSimpleUI();
+                setupSimpleListeners();
+            }, 100);
+        });
+
+        function checkAuth() {
+            try {
+                if (!window.authModule || typeof window.authModule.getCurrentUser !== 'function') {
+                    console.log('Auth module chưa sẵn sàng, chuyển về trang đăng nhập');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const currentUser = window.authModule.getCurrentUser();
+                
+                if (!currentUser) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const userInfo = document.getElementById('userInfo');
+                const userName = document.getElementById('userName');
+                const userRoleText = document.getElementById('userRole');
+                
+                if (userInfo && userName && userRoleText) {
+                    userInfo.style.display = 'flex';
+                    userName.textContent = currentUser.fullName;
+                    userRoleText.textContent = currentUser.role === 'admin' ? '👑 Quản trị viên' : '🎓 ' + currentUser.studentId;
+                }
+                
+                // Hiển thị admin tab nếu là admin
+                if (currentUser.role === 'admin') {
+                    document.querySelectorAll('.admin-only').forEach(el => {
+                        el.style.display = 'block';
+                    });
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        function initializeSimpleUI() {
+            const tabs = document.getElementById('tabs');
+            if (tabs) tabs.style.display = 'flex';
+        }
+
+        function setupSimpleListeners() {
+            // Logout
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                        if (window.authModule) {
+                            window.authModule.logout();
+                        } else {
+                            window.location.href = 'login.html';
+                        }
+                    }
+                });
+            }
+
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.dataset.tab;
+                    
+                    // Remove active from all
+                    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active to current
+                    button.classList.add('active');
+                    document.getElementById(tabName).classList.add('active');
+                });
+            });
+
+            // Connect wallet button
+            const connectBtn = document.getElementById('connectWallet');
+            if (connectBtn) {
+                connectBtn.addEventListener('click', () => {
+                    alert('Chức năng kết nối MetaMask sẽ được tích hợp sau khi deploy smart contract.\n\nHiện tại bạn có thể sử dụng các chức năng khác của hệ thống.');
+                });
+            }
+            
+            // Form submission
+            const candidateForm = document.getElementById('candidateForm');
+            if (candidateForm) {
+                candidateForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('candidateName').value;
+                    const position = document.getElementById('candidatePosition').value;
+                    
+                    alert(`Đăng ký ứng cử thành công!\n\nHọ tên: ${name}\nVị trí: ${position}\n\n(Chức năng này sẽ được tích hợp với blockchain sau)`);
+                    candidateForm.reset();
+                });
+            }
+            
+            // Refresh results
+            const refreshBtn = document.getElementById('refreshResults');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    alert('Làm mới kết quả bầu cử\n\n(Chức năng này sẽ được tích hợp với blockchain sau)');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

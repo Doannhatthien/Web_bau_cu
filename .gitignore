@@ -1,0 +1,22 @@
+node_modules/
+cache/
+artifacts/
+coverage/
+*.env
+.DS_Store
+package-lock.json
+yarn.lock
+
+# Hardhat files
+typechain-types/
+deployments/
+
+# Build files
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập - Hệ Thống Bầu Cử</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="background-animation">
+        <div class="circle circle1"></div>
+        <div class="circle circle2"></div>
+        <div class="circle circle3"></div>
+        <div class="circle circle4"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-section">
+                <div class="logo-circle">🗳️</div>
+                <h1>Hệ Thống Bầu Cử Lớp</h1>
+                <p class="tagline">Blockchain - Minh bạch & Bảo mật</p>
+            </div>
+
+            <!-- Form Đăng Nhập -->
+            <div class="form-container" id="loginForm">
+                <h2>Đăng Nhập</h2>
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <label for="loginUsername">
+                            <span class="icon">👤</span>
+                            Tên đăng nhập
+                        </label>
+                        <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loginPassword">
+                            <span class="icon">🔒</span>
+                            Mật khẩu
+                        </label>
+                        <input type="password" id="loginPassword" placeholder="Nhập mật khẩu" required>
+                    </div>
+
+                    <div class="remember-forgot">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Ghi nhớ đăng nhập</span>
+                        </label>
+                        <a href="#" class="forgot-password">Quên mật khẩu?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-login">Đăng Nhập</button>
+                </form>
+
+                <div class="form-switch">
+                    <p>Chưa có tài khoản? <a href="#" id="switchToRegister">Đăng ký ngay</a></p>
+                </div>
+            </div>
+
+            <!-- Form Đăng Ký -->
+            <div class="form-container hidden" id="registerForm">
+                <h2>Đăng Ký Tài Khoản</h2>
+                <form id="registerFormElement">
+                    <div class="input-group">
+                        <label for="registerFullName">
+                            <span class="icon">👤</span>
+                            Họ và tên
+                        </label>
+                        <input type="text" id="registerFullName" placeholder="Nguyễn Văn A" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerUsername">
+                            <span class="icon">✉️</span>
+                            Tên đăng nhập
+                        </label>
+                        <input type="text" id="registerUsername" placeholder="Chọn tên đăng nhập" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerStudentId">
+                            <span class="icon">🎓</span>
+                            Mã sinh viên
+                        </label>
+                        <input type="text" id="registerStudentId" placeholder="SV123456" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerPassword">
+                            <span class="icon">🔒</span>
+                            Mật khẩu
+                        </label>
+                        <input type="password" id="registerPassword" placeholder="Tối thiểu 6 ký tự" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="registerConfirmPassword">
+                            <span class="icon">🔐</span>
+                            Xác nhận mật khẩu
+                        </label>
+                        <input type="password" id="registerConfirmPassword" placeholder="Nhập lại mật khẩu" required>
+                    </div>
+
+                    <div class="terms-agreement">
+                        <label class="remember-me">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <span>Tôi đồng ý với <a href="#">điều khoản sử dụng</a></span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-register">Đăng Ký</button>
+                </form>
+
+                <div class="form-switch">
+                    <p>Đã có tài khoản? <a href="#" id="switchToLogin">Đăng nhập</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message"></span>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

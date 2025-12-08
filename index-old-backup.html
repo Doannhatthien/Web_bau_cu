@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Bầu Cử Lớp - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗳️ Hệ Thống Bầu Cử Lớp Online</h1>
+            <p class="subtitle">Dựa trên công nghệ Blockchain - Minh bạch & Bảo mật</p>
+            
+            <!-- Thông tin người dùng -->
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-details">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-text">
+                        <h3 id="userName">-</h3>
+                        <p id="userRole">-</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+            </div>
+        </header>
+
+        <!-- Thông tin kết nối -->
+        <div class="connection-status" id="connectionStatus">
+            <div class="status-item">
+                <span>Trạng thái:</span>
+                <span id="statusText" class="status-disconnected">Chưa kết nối</span>
+            </div>
+            <div class="status-item">
+                <span>Địa chỉ ví:</span>
+                <span id="accountAddress">Chưa kết nối</span>
+            </div>
+            <div class="status-item">
+                <span>Vai trò:</span>
+                <span id="userRole">-</span>
+            </div>
+        </div>
+
+        <button id="connectWallet" class="btn btn-primary btn-large">Kết nối MetaMask</button>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="tabs" style="display: none;">
+            <button class="tab-button active" data-tab="voting">Bỏ Phiếu</button>
+            <button class="tab-button" data-tab="results">Kết Quả</button>
+            <button class="tab-button" data-tab="registration">Đăng Ký Ứng Viên</button>
+            <button class="tab-button admin-only" data-tab="admin">Quản Trị</button>
+        </div>
+
+        <!-- Voting Tab -->
+        <div class="tab-content active" id="voting">
+            <div class="section">
+                <h2>🎯 Thông Tin Bầu Cử</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Trạng thái bầu cử</h3>
+                        <p id="electionState" class="state-text">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Số ứng viên</h3>
+                        <p id="candidateCount" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Tổng số phiếu</h3>
+                        <p id="totalVotes" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Trạng thái của bạn</h3>
+                        <p id="voterStatus" class="status-text">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>👥 Danh Sách Ứng Viên</h2>
+                <div id="candidatesList" class="candidates-list">
+                    <p class="empty-state">Chưa có ứng viên nào</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div class="tab-content" id="results">
+            <div class="section">
+                <h2>📊 Kết Quả Bầu Cử</h2>
+                <button id="refreshResults" class="btn btn-secondary">Làm mới kết quả</button>
+                <div id="resultsList" class="results-list">
+                    <p class="empty-state">Chưa có kết quả</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📈 Biểu Đồ Kết Quả</h2>
+                <canvas id="resultsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Registration Tab -->
+        <div class="tab-content" id="registration">
+            <div class="section">
+                <h2>📝 Đăng Ký Ứng Viên</h2>
+                <p class="description">Đăng ký tham gia ứng cử vào ban cán sự lớp</p>
+                
+                <form id="candidateForm" class="form">
+                    <div class="form-group">
+                        <label for="candidateName">Họ và tên:</label>
+                        <input type="text" id="candidateName" placeholder="Nhập họ tên đầy đủ" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="candidatePosition">Vị trí ứng cử:</label>
+                        <select id="candidatePosition" required>
+                            <option value="">-- Chọn vị trí --</option>
+                            <option value="Lop truong">Lớp trưởng</option>
+                            <option value="Lop pho">Lớp phó</option>
+                            <option value="Bi thu">Bí thư</option>
+                            <option value="Uyen van">Ủy viên văn nghệ</option>
+                            <option value="Hoc van">Ủy viên học vấn</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Đăng ký ứng cử</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>📋 Quy Định Ban Cán Sự Lớp</h2>
+                <div class="positions-list" id="positionsList">
+                    <div class="position-item">
+                        <strong>Lớp trưởng:</strong> Điều hành hoạt động lớp, đại diện lớp
+                    </div>
+                    <div class="position-item">
+                        <strong>Lớp phó:</strong> Hỗ trợ lớp trưởng, phụ trách chuyên cần
+                    </div>
+                    <div class="position-item">
+                        <strong>Bí thư:</strong> Công tác Đoàn, phong trào
+                    </div>
+                    <div class="position-item">
+                        <strong>Ủy viên văn nghệ:</strong> Tổ chức hoạt động văn hóa, văn nghệ
+                    </div>
+                    <div class="position-item">
+                        <strong>Ủy viên học vấn:</strong> Theo dõi kết quả học tập, tổ chức học nhóm
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div class="tab-content admin-only" id="admin">
+            <div class="section">
+                <h2>⚙️ Quản Trị Hệ Thống</h2>
+                
+                <div class="admin-panel">
+                    <div class="admin-section">
+                        <h3>Đăng ký cử tri</h3>
+                        <div class="form-group">
+                            <label for="voterAddress">Địa chỉ ví cử tri:</label>
+                            <input type="text" id="voterAddress" placeholder="0x...">
+                        </div>
+                        <button id="registerVoter" class="btn btn-primary">Đăng ký cử tri</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Đăng ký nhiều cử tri</h3>
+                        <div class="form-group">
+                            <label for="voterAddresses">Danh sách địa chỉ (mỗi địa chỉ một dòng):</label>
+                            <textarea id="voterAddresses" rows="5" placeholder="0x...&#10;0x...&#10;0x..."></textarea>
+                        </div>
+                        <button id="registerMultipleVoters" class="btn btn-primary">Đăng ký nhiều cử tri</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Thêm ứng viên thủ công</h3>
+                        <div class="form-group">
+                            <label for="adminCandidateName">Họ tên:</label>
+                            <input type="text" id="adminCandidateName" placeholder="Nguyễn Văn A">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminCandidatePosition">Vị trí:</label>
+                            <select id="adminCandidatePosition">
+                                <option value="Lop truong">Lớp trưởng</option>
+                                <option value="Lop pho">Lớp phó</option>
+                                <option value="Bi thu">Bí thư</option>
+                                <option value="Uyen van">Ủy viên văn nghệ</option>
+                                <option value="Hoc van">Ủy viên học vấn</option>
+                            </select>
+                        </div>
+                        <button id="addCandidate" class="btn btn-success">Thêm ứng viên</button>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Điều khiển bầu cử</h3>
+                        <div class="button-group">
+                            <button id="startRegistration" class="btn btn-warning">Bắt đầu đăng ký ứng viên</button>
+                            <button id="startVoting" class="btn btn-success">Bắt đầu bỏ phiếu</button>
+                            <button id="endElection" class="btn btn-danger">Kết thúc bầu cử</button>
+                            <button id="resetElection" class="btn btn-secondary">Reset hệ thống</button>
+                        </div>
+                    </div>
+
+                    <div class="admin-section">
+                        <h3>Thêm vị trí tùy chỉnh</h3>
+                        <div class="form-group">
+                            <label for="customPosition">Tên vị trí:</label>
+                            <input type="text" id="customPosition" placeholder="Ví dụ: Thủ quỹ">
+                        </div>
+                        <button id="addPosition" class="btn btn-info">Thêm vị trí</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 - Hệ Thống Bầu Cử Lớp Blockchain | Phát triển với Ethereum & Solidity</p>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Tắt cảnh báo source map trong console
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+            const errorString = args.join(' ');
+            if (errorString.includes('source map') || errorString.includes('ENOENT')) {
+                return; // Bỏ qua lỗi source map
+            }
+            originalConsoleError.apply(console, args);
+        };
+        
+        const originalConsoleWarn = console.warn;
+        console.warn = function(...args) {
+            const warnString = args.join(' ');
+            if (warnString.includes('source map') || warnString.includes('ENOENT')) {
+                return; // Bỏ qua cảnh báo source map
+            }
+            originalConsoleWarn.apply(console, args);
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
