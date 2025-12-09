@@ -8,6 +8,7 @@ echo Dang khoi dong server...
 echo.
 
 cd /d "%~dp0"
+cd ..\Frontend
 
 REM Chay server
 start /min cmd /c "npx http-server -p 8000"

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bầu Cử Khép Kín</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .private-voting-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .lock-screen {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .lock-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: lockPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes lockPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .password-input-group {
+            max-width: 400px;
+            margin: 30px auto;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3em;
+            text-align: center;
+            border: 3px solid #E0E0E0;
+            border-radius: 12px;
+            letter-spacing: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--danger-color);
+            box-shadow: 0 0 0 5px rgba(255, 23, 68, 0.1);
+        }
+
+        .password-input.error {
+            border-color: var(--danger-color);
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .voting-area {
+            display: none;
+        }
+
+        .voting-area.unlocked {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .security-notice {
+            background: linear-gradient(135deg, #FFE0E0, #FFF0F0);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border-left: 5px solid var(--danger-color);
+        }
+
+        .security-notice strong {
+            color: var(--danger-color);
+        }
+
+        .candidate-card-private {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #E0E0E0;
+            transition: all 0.3s ease;
+        }
+
+        .candidate-card-private:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .candidate-card-private.selected {
+            border-color: var(--secondary-color);
+            background: linear-gradient(135deg, #E8F5E9, #F1F8E9);
+        }
+
+        .vote-confirm-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 Bầu Cử Khép Kín</h1>
+            <p class="subtitle">Chế độ bảo mật cao - Yêu cầu mật khẩu</p>
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-details">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-text">
+                        <h3 id="userName">-</h3>
+                        <p id="userRole">-</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div class="private-voting-container">
+            <!-- Back button -->
+            <button onclick="window.location.href='index.html'" class="btn btn-secondary" style="margin-bottom: 20px;">
+                ← Quay lại trang chính
+            </button>
+
+            <!-- Lock Screen -->
+            <div class="lock-screen" id="lockScreen">
+                <div class="lock-icon">🔐</div>
+                <h2 style="color: var(--danger-color); margin-bottom: 10px;">Khu vực bảo mật</h2>
+                <p style="color: #666; font-size: 1.1em; margin-bottom: 30px;">
+                    Đây là phiên bầu cử khép kín. Vui lòng nhập mật khẩu để tiếp tục.
+                </p>
+
+                <div class="security-notice">
+                    <strong>🔒 Lưu ý bảo mật:</strong>
+                    <ul style="text-align: left; margin-top: 10px; line-height: 1.8;">
+                        <li>Mật khẩu chỉ được admin cung cấp</li>
+                        <li>Không chia sẻ mật khẩu với người không liên quan</li>
+                        <li>Mỗi tài khoản chỉ được bỏ phiếu 1 lần</li>
+                        <li>Phiếu bầu của bạn được bảo mật tuyệt đối</li>
+                    </ul>
+                </div>
+
+                <div class="password-input-group">
+                    <input 
+                        type="password" 
+                        id="electionPasswordInput" 
+                        class="password-input" 
+                        placeholder="••••••••"
+                        maxlength="20"
+                    >
+                    <p id="passwordError" style="color: var(--danger-color); margin-top: 10px; display: none;">
+                        ❌ Mật khẩu không chính xác!
+                    </p>
+                </div>
+
+                <button id="unlockVoting" class="btn btn-danger btn-large" style="max-width: 400px; margin: 20px auto;">
+                    🔓 Mở khóa và Bỏ phiếu
+                </button>
+
+                <p style="color: #999; margin-top: 20px; font-size: 0.9em;">
+                    Liên hệ admin nếu bạn chưa có mật khẩu
+                </p>
+            </div>
+
+            <!-- Voting Area (Hidden initially) -->
+            <div class="voting-area" id="votingArea">
+                <div class="section">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <span style="font-size: 2em;">✅</span>
+                        <div>
+                            <h2 style="margin: 0; color: var(--secondary-color);">Xác thực thành công!</h2>
+                            <p style="margin: 5px 0 0 0; color: #666;">Bạn có thể bỏ phiếu ngay bây giờ</p>
+                        </div>
+                    </div>
+
+                    <div class="security-notice">
+                        <strong>🔒 Phiếu bầu của bạn hoàn toàn bí mật</strong>
+                        <p style="margin-top: 10px; color: #666;">
+                            Không ai có thể biết bạn đã bầu cho ai. Hệ thống chỉ ghi nhận rằng bạn đã tham gia bỏ phiếu.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>👥 Danh Sách Ứng Viên</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Click vào ứng viên để chọn, sau đó xác nhận bầu cử bên dưới</p>
+                    
+                    <div id="candidatesListPrivate">
+                        <!-- Candidates will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="vote-confirm-section" id="voteConfirmSection" style="display: none;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">📝 Xác nhận lựa chọn của bạn</h3>
+                    
+                    <div style="background: #F5F5F5; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <p style="color: #666; margin-bottom: 10px;">Bạn đã chọn:</p>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <span style="font-size: 2em;">👤</span>
+                            <div>
+                                <h3 id="selectedCandidateName" style="margin: 0; color: var(--dark-color);">-</h3>
+                                <p id="selectedCandidatePosition" style="margin: 5px 0 0 0; color: #666;">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: #FFF3E0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid var(--warning-color);">
+                        <strong style="color: var(--warning-color);">⚠️ Lưu ý:</strong>
+                        <p style="margin-top: 8px; color: #666;">
+                            Sau khi xác nhận, bạn KHÔNG THỂ thay đổi lựa chọn. Vui lòng kiểm tra kỹ trước khi bấm nút xác nhận.
+                        </p>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="confirmVoteBtn" class="btn btn-success" style="flex: 2;">
+                            ✓ Xác nhận Bầu cử
+                        </button>
+                        <button id="cancelVoteBtn" class="btn btn-secondary" style="flex: 1;">
+                            ✕ Hủy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Already Voted Notice -->
+                <div class="section" id="alreadyVotedNotice" style="display: none;">
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 5em; margin-bottom: 20px;">✅</div>
+                        <h2 style="color: var(--secondary-color);">Bạn đã bỏ phiếu!</h2>
+                        <p style="color: #666; font-size: 1.1em; margin-top: 10px;">
+                            Cảm ơn bạn đã tham gia bầu cử. Phiếu bầu của bạn đã được ghi nhận.
+                        </p>
+                        <button onclick="window.location.href='index.html'" class="btn btn-primary" style="margin-top: 20px;">
+                            Xem kết quả bầu cử
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 - Hệ Thống Bầu Cử Lớp Blockchain | Bầu cử Khép kín</p>
+        </footer>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="private-voting.js"></script>
+</body>
+</html>

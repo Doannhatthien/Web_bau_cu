@@ -43,6 +43,25 @@
 
         <button id="connectWallet" class="btn btn-primary btn-large">Kết nối MetaMask</button>
 
+        <!-- Election Mode Navigation -->
+        <div class="section" style="background: linear-gradient(135deg, #FFF3E0, #FFE0B2); padding: 20px; border-radius: 15px; margin: 20px 0;">
+            <h3 style="margin: 0 0 15px 0; color: var(--dark-color);">🗳️ Chế độ Bầu cử</h3>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button onclick="window.location.href='index.html'" class="btn btn-primary" style="flex: 1; min-width: 200px;">
+                    🌐 Bầu cử Công khai
+                </button>
+                <button onclick="window.location.href='private-voting.html'" class="btn btn-danger" style="flex: 1; min-width: 200px;">
+                    🔒 Bầu cử Khép kín
+                </button>
+                <button onclick="window.location.href='election-config.html'" class="btn btn-warning admin-only" style="flex: 1; min-width: 200px; display: none;" id="configBtn">
+                    ⚙️ Cấu hình (Admin)
+                </button>
+            </div>
+            <div id="currentModeDisplay" style="margin-top: 15px; padding: 15px; background: white; border-radius: 10px; text-align: center;">
+                <strong>Chế độ hiện tại:</strong> <span id="currentModeText">Đang tải...</span>
+            </div>
+        </div>
+
         <!-- Tab Navigation -->
         <div class="tabs" id="tabs">
             <button class="tab-button active" data-tab="voting">Bỏ Phiếu</button>
@@ -184,10 +203,39 @@
                         el.style.display = 'block';
                     });
                 }
+                
+                // Load current election mode
+                loadCurrentMode();
             } catch (error) {
                 console.error('Lỗi:', error);
                 window.location.href = 'login.html';
             }
+        }
+        
+        function loadCurrentMode() {
+            const config = JSON.parse(localStorage.getItem('election_config') || '{}');
+            const modeText = document.getElementById('currentModeText');
+            
+            if (!config.mode) {
+                config.mode = 'public';
+                config.password = generateRandomPassword();
+                localStorage.setItem('election_config', JSON.stringify(config));
+            }
+            
+            if (config.mode === 'public') {
+                modeText.innerHTML = '<span style="color: var(--primary-color); font-weight: bold;">🌐 Bầu cử Công khai</span>';
+            } else {
+                modeText.innerHTML = '<span style="color: var(--danger-color); font-weight: bold;">🔒 Bầu cử Khép kín</span>';
+            }
+        }
+        
+        function generateRandomPassword() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
         }
 
         function initializeSimpleUI() {
