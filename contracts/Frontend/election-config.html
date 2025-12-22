@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cấu hình Bầu Cử - Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .election-mode-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .election-mode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .election-mode-card.public {
+            border-color: var(--secondary-color);
+        }
+        
+        .election-mode-card.private {
+            border-color: var(--danger-color);
+        }
+        
+        .mode-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-icon {
+            font-size: 3em;
+        }
+        
+        .mode-title h3 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--primary-color), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .mode-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .mode-features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .mode-features li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mode-features li::before {
+            content: "✓";
+            background: linear-gradient(135deg, var(--secondary-color), var(--green-dark));
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .password-section {
+            background: #FFF3E0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .password-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--danger-color);
+            text-align: center;
+            margin: 10px 0;
+            letter-spacing: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+        
+        .status-active {
+            background: linear-gradient(135deg, var(--secondary-color), var(--green-dark));
+            color: white;
+        }
+        
+        .status-inactive {
+            background: #E0E0E0;
+            color: #666;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-activate {
+            flex: 1;
+            min-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Cấu Hình Chế Độ Bầu Cử</h1>
+            <p class="subtitle">Dành riêng cho Quản trị viên</p>
+            
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="user-details">
+                    <div class="user-avatar">👑</div>
+                    <div class="user-text">
+                        <h3 id="userName">Admin</h3>
+                        <p id="userRole">Quản trị viên</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+            </div>
+        </header>
+
+        <div style="padding: 20px;">
+            <!-- Back button -->
+            <button onclick="window.location.href='index.html'" class="btn btn-secondary" style="margin-bottom: 20px;">
+                ← Quay lại trang chính
+            </button>
+
+            <!-- Current Status -->
+            <div class="section">
+                <h2>📊 Trạng thái hiện tại</h2>
+                <div class="info-card" style="text-align: center;">
+                    <h3>Chế độ đang hoạt động</h3>
+                    <p id="currentMode" style="font-size: 2em; margin: 20px 0; font-weight: bold;">
+                        🌐 Bầu cử Công khai
+                    </p>
+                    <span id="currentStatus" class="status-badge status-active">Đang hoạt động</span>
+                </div>
+            </div>
+
+            <!-- Public Election Mode -->
+            <div class="election-mode-card public">
+                <div class="mode-header">
+                    <div class="mode-icon">🌐</div>
+                    <div class="mode-title">
+                        <h3>Bầu Cử Công Khai</h3>
+                        <span class="status-badge" id="publicStatus">Đang hoạt động</span>
+                    </div>
+                </div>
+                
+                <div class="mode-description">
+                    <p><strong>Mô tả:</strong> Chế độ bầu cử truyền thống, người dùng chỉ cần đăng nhập tài khoản để bỏ phiếu. Phù hợp với bầu cử thông thường trong lớp học.</p>
+                </div>
+
+                <ul class="mode-features">
+                    <li>Đăng nhập bằng tài khoản cá nhân</li>
+                    <li>Không yêu cầu mật khẩu bổ sung</li>
+                    <li>Phù hợp cho bầu cử lớp học</li>
+                    <li>Dễ sử dụng, thân thiện</li>
+                    <li>Minh bạch với tất cả thành viên</li>
+                </ul>
+
+                <div class="button-group">
+                    <button id="activatePublic" class="btn btn-success btn-activate">
+                        ✓ Kích hoạt chế độ Công khai
+                    </button>
+                </div>
+            </div>
+
+            <!-- Private Election Mode -->
+            <div class="election-mode-card private">
+                <div class="mode-header">
+                    <div class="mode-icon">🔒</div>
+                    <div class="mode-title">
+                        <h3>Bầu Cử Khép Kín</h3>
+                        <span class="status-badge status-inactive" id="privateStatus">Chưa kích hoạt</span>
+                    </div>
+                </div>
+                
+                <div class="mode-description">
+                    <p><strong>Mô tả:</strong> Chế độ bầu cử bảo mật cao, yêu cầu mật khẩu đặc biệt để bỏ phiếu. Chỉ những người có mật khẩu mới có thể tham gia bầu cử.</p>
+                </div>
+
+                <ul class="mode-features">
+                    <li>Bảo mật cấp cao với mật khẩu</li>
+                    <li>Chỉ admin có thể tạo mật khẩu</li>
+                    <li>Kiểm soát chặt chẽ người bỏ phiếu</li>
+                    <li>Phù hợp cho bầu cử quan trọng</li>
+                    <li>Đảm bảo tính bí mật tuyệt đối</li>
+                </ul>
+
+                <div class="password-section" id="passwordSection" style="display: none;">
+                    <h4 style="color: var(--warning-color); margin-bottom: 10px;">🔑 Mật khẩu bầu cử</h4>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
+                        Chia sẻ mật khẩu này cho những người được phép bỏ phiếu. 
+                        <strong style="color: var(--danger-color);">LƯU Ý: Giữ bí mật!</strong>
+                    </p>
+                    <div class="password-display" id="electionPassword">
+                        VOTE2025
+                    </div>
+                    <div class="button-group" style="margin-top: 15px;">
+                        <button id="copyPassword" class="btn btn-info">
+                            📋 Copy mật khẩu
+                        </button>
+                        <button id="regeneratePassword" class="btn btn-warning">
+                            🔄 Tạo mật khẩu mới
+                        </button>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button id="activatePrivate" class="btn btn-danger btn-activate">
+                        🔒 Kích hoạt chế độ Khép kín
+                    </button>
+                    <button id="deactivatePrivate" class="btn btn-secondary btn-activate" style="display: none;">
+                        ⛔ Tắt chế độ Khép kín
+                    </button>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="section">
+                <h2>📖 Hướng dẫn sử dụng</h2>
+                <div style="background: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: var(--primary-color);">Chế độ Công khai:</h3>
+                    <ol style="line-height: 2;">
+                        <li>Click nút "Kích hoạt chế độ Công khai"</li>
+                        <li>Học sinh đăng nhập tài khoản như bình thường</li>
+                        <li>Vào trang chủ và bỏ phiếu trực tiếp</li>
+                    </ol>
+
+                    <h3 style="color: var(--danger-color); margin-top: 20px;">Chế độ Khép kín:</h3>
+                    <ol style="line-height: 2;">
+                        <li>Click nút "Kích hoạt chế độ Khép kín"</li>
+                        <li>Hệ thống sẽ tạo mật khẩu tự động</li>
+                        <li>Copy và chia sẻ mật khẩu cho người được bỏ phiếu</li>
+                        <li>Học sinh vào trang "Bầu cử Khép kín" và nhập mật khẩu</li>
+                        <li>Sau khi nhập đúng mật khẩu, họ có thể bỏ phiếu</li>
+                    </ol>
+
+                    <div style="background: #FFF3E0; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid var(--warning-color);">
+                        <strong>⚠️ Lưu ý quan trọng:</strong>
+                        <ul style="margin-top: 10px; line-height: 1.8;">
+                            <li>Chỉ có thể chọn 1 trong 2 chế độ tại 1 thời điểm</li>
+                            <li>Mật khẩu khép kín chỉ admin mới thấy được</li>
+                            <li>Có thể tạo lại mật khẩu mới bất cứ lúc nào</li>
+                            <li>Nên sử dụng chế độ Khép kín cho các bầu cử quan trọng</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 - Hệ Thống Bầu Cử Lớp Blockchain | Quản trị bởi Admin</p>
+        </footer>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="election-config.js"></script>
+</body>
+</html>
