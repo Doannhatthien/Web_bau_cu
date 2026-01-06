@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Bầu Cử Lớp - Blockchain</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗳️ Bầu Cử Lớp Blockchain</h1>
+            <p class="subtitle">Minh bạch & Bảo mật</p>
+            
+            <!-- Thông tin người dùng -->
+            <div class="user-info" id="userInfo">
+                <div class="user-details">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-text">
+                        <h3 id="userName">-</h3>
+                        <p id="userRole">-</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
+            </div>
+
+            <!-- Kết nối -->
+            <div class="connection-status" id="connectionStatus">
+                <div class="status-item">
+                    <span>🔗</span>
+                    <span id="statusText" class="status-disconnected">Chưa kết nối</span>
+                </div>
+                <div class="status-item">
+                    <span>💳</span>
+                    <span id="accountAddress">Chưa kết nối</span>
+                </div>
+            </div>
+
+            <button id="connectWallet" class="btn btn-primary btn-large" onclick="connectWallet()" style="position: relative; z-index: 1000; cursor: pointer; pointer-events: auto;">
+                🦊 Kết nối MetaMask
+            </button>
+            
+
+        </header>
+
+        <!-- Chế độ bầu cử -->
+        <div class="section" style="background: #f8f9fa; padding: 15px 20px; margin: 20px 0; border-radius: 12px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" style="flex: 1; min-width: 180px;">
+                    🌐 Bầu cử Công khai
+                </button>
+                <button onclick="window.location.href='private-voting.html'" class="btn btn-danger" style="flex: 1; min-width: 180px;">
+                    🔒 Bầu cử Khép kín
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="tabs">
+            <button class="tab-button active" data-tab="voting">Bỏ Phiếu</button>
+            <button class="tab-button" data-tab="results">Kết Quả</button>
+            <button class="tab-button can-register" data-tab="registration" style="display: inline-block !important; visibility: visible !important;">Đăng Ký Ứng Viên</button>
+            <button class="tab-button admin-only" data-tab="admin" style="display: inline-block !important; visibility: visible !important;">Quản Trị</button>
+        </div>
+
+        <!-- Voting Tab -->
+        <div class="tab-content active" id="voting">
+            <div class="section">
+                <h2>🎯 Thông Tin Bầu Cử</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Trạng thái bầu cử</h3>
+                        <p id="electionState" class="state-text">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Số ứng viên</h3>
+                        <p id="candidateCount" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Tổng số phiếu</h3>
+                        <p id="totalVotes" class="count-text">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Trạng thái của bạn</h3>
+                        <p id="voterStatus" class="status-text">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>👥 Danh Sách Ứng Viên</h2>
+                <div id="candidatesList" class="candidates-list">
+                    <p class="empty-state">Chưa có ứng viên nào</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Tab -->
+        <div class="tab-content" id="results">
+            <div class="section">
+                <h2>📊 Kết Quả Bầu Cử</h2>
+                <button id="refreshResults" class="btn btn-secondary">Làm mới kết quả</button>
+                <div id="resultsList" class="results-list">
+                    <p class="empty-state">Chưa có kết quả</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Tab -->
+        <div class="tab-content can-register" id="registration">
+            <div class="section">
+                <h2>📝 Đăng Ký Ứng Viên</h2>
+                
+                <form id="candidateForm" class="form">
+                    <div class="form-group">
+                        <label for="candidateName">Họ và tên:</label>
+                        <input type="text" id="candidateName" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="candidatePosition">Vị trí ứng cử:</label>
+                        <select id="candidatePosition" required>
+                            <option value="">-- Chọn vị trí --</option>
+                            <option value="Lop truong">Lớp trưởng</option>
+                            <option value="Lop pho">Lớp phó</option>
+                            <option value="Bi thu">Bí thư</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success" id="registerCandidateBtn">Đăng ký ứng cử</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div class="tab-content admin-only" id="admin">
+            <div class="section">
+                <h2>⚙️ Quản Trị Hệ Thống</h2>
+                <p>Chức năng quản trị dành cho admin</p>
+                
+                <!-- Quản lý trạng thái bầu cử -->
+                <div class="admin-section">
+                    <h3>📊 Điều Khiển Trạng Thái Bầu Cử</h3>
+                    <div class="admin-buttons">
+                        <button onclick="startRegistration()" class="btn btn-primary">
+                            ▶️ Bắt đầu đăng ký ứng viên
+                        </button>
+                        <button onclick="startVoting()" class="btn btn-success">
+                            🗳️ Bắt đầu bỏ phiếu
+                        </button>
+                        <button onclick="endElection()" class="btn btn-danger">
+                            🏁 Kết thúc bầu cử
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Đăng ký cử tri -->
+                <div class="admin-section">
+                    <h3>👥 Đăng Ký Cử Tri</h3>
+                    <div class="form-group">
+                        <label>Địa chỉ ví cử tri:</label>
+                        <input type="text" id="voterAddress" placeholder="0x..." class="form-control">
+                        <button onclick="registerVoter()" class="btn btn-primary" style="margin-top: 10px;">
+                            Đăng ký cử tri
+                        </button>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Đăng ký nhiều cử tri (mỗi địa chỉ 1 dòng):</label>
+                        <textarea id="voterAddresses" rows="5" placeholder="0x...&#10;0x...&#10;0x..." class="form-control"></textarea>
+                        <button onclick="registerMultipleVoters()" class="btn btn-primary" style="margin-top: 10px;">
+                            Đăng ký hàng loạt
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Thêm ứng viên -->
+                <div class="admin-section">
+                    <h3>➕ Thêm Ứng Viên (Admin)</h3>
+                    <div class="form-group">
+                        <label>Tên ứng viên:</label>
+                        <input type="text" id="adminCandidateName" placeholder="Nguyễn Văn A" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Vị trí:</label>
+                        <select id="adminCandidatePosition" class="form-control">
+                            <option value="Lop truong">Lớp trưởng</option>
+                            <option value="Lop pho">Lớp phó</option>
+                            <option value="Bi thu">Bí thư</option>
+                        </select>
+                    </div>
+                    <button onclick="addCandidateAdmin()" class="btn btn-success">
+                        Thêm ứng viên
+                    </button>
+                </div>
+                
+                <!-- Danh sách sinh viên từ MongoDB -->
+                <div class="admin-section">
+                    <h3>👨‍🎓 Danh Sách Sinh Viên (MongoDB)</h3>
+                    <button onclick="loadUsersFromMongoDB()" class="btn btn-primary" style="margin-bottom: 15px;">
+                        🔄 Tải danh sách
+                    </button>
+                    <div id="usersList" style="max-height: 400px; overflow-y: auto;">
+                        <p class="empty-state">Click "Tải danh sách" để xem</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 - Hệ Thống Bầu Cử Lớp Blockchain | Phát triển với Ethereum & Solidity</p>
+        </footer>
+    </div>
+
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Đang xử lý...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script>
+        // KHÔNG DÙNG app.js NỮA - NHÚNG CODE TRỰC TIẾP
+        let web3, contract, userAccount, isAdmin = false;
+        
+        const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+        const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"candidateId","type":"uint256"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"string","name":"position","type":"string"}],"name":"CandidateRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"enum ClassElection.ElectionState","name":"newState","type":"uint8"}],"name":"ElectionStateChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"voter","type":"address"},{"indexed":false,"internalType":"uint256","name":"candidateId","type":"uint256"}],"name":"Voted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"voter","type":"address"}],"name":"VoterRegistered","type":"event"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_position","type":"string"}],"name":"addCandidate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"_position","type":"string"}],"name":"addPosition","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"admin","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"candidates","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"candidatesCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endElection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCandidates","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"internalType":"struct ClassElection.Candidate[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"getPosition","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPositionsCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getResults","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"internalType":"struct ClassElection.Candidate[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTotalVotes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"positions","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_position","type":"string"}],"name":"registerCandidate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_voter","type":"address"}],"name":"registerVoter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"_voters","type":"address[]"}],"name":"registerVoters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"resetElection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startRegistration","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startVoting","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"state","outputs":[{"internalType":"enum ClassElection.ElectionState","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_candidateId","type":"uint256"}],"name":"vote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voterAddresses","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"voters","outputs":[{"internalType":"bool","name":"isRegistered","type":"bool"},{"internalType":"bool","name":"hasVoted","type":"bool"},{"internalType":"uint256","name":"votedCandidateId","type":"uint256"},{"internalType":"bool","name":"canRegisterCandidates","type":"bool"}],"stateMutability":"view","type":"function"}];
+        
+        // Connect MetaMask
+        async function connectWallet() {
+            console.log('connectWallet function called');
+            console.log('window.ethereum:', window.ethereum);
+            
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    alert('❌ Vui lòng cài đặt MetaMask!\n\nDownload tại: https://metamask.io');
+                    window.open('https://metamask.io/download/', '_blank');
+                    return;
+                }
+                
+                // Thêm/chuyển sang mạng Hardhat Local
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x7A69' }], // 31337 in hex
+                    });
+                } catch (switchError) {
+                    // Nếu mạng chưa được thêm, thêm mới
+                    if (switchError.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x7A69',
+                                    chainName: 'Hardhat Local',
+                                    nativeCurrency: {
+                                        name: 'Ether',
+                                        symbol: 'ETH',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['http://127.0.0.1:8545'],
+                                    blockExplorerUrls: null
+                                }]
+                            });
+                        } catch (addError) {
+                            alert('❌ Không thể thêm mạng Hardhat Local!\n\nVui lòng thêm thủ công:\nRPC URL: http://127.0.0.1:8545\nChain ID: 31337');
+                            return;
+                        }
+                    } else {
+                        alert('❌ Không thể chuyển sang mạng Hardhat Local!\n\n' + switchError.message);
+                        return;
+                    }
+                }
+                
+                console.log('Requesting accounts...');
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                console.log('Connected account:', userAccount);
+                
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                console.log('Contract initialized:', CONTRACT_ADDRESS);
+                
+                // Check if admin (with error handling)
+                try {
+                    const adminAddress = await contract.methods.admin().call();
+                    isAdmin = (userAccount.toLowerCase() === adminAddress.toLowerCase());
+                    console.log('Is admin:', isAdmin);
+                } catch (err) {
+                    console.warn('Could not check admin status:', err);
+                    isAdmin = false;
+                }
+                
+                // Kiểm tra quyền đăng ký ứng viên
+                let canRegisterCandidates = isAdmin;
+                try {
+                    const voterInfo = await contract.methods.voters(userAccount).call();
+                    canRegisterCandidates = isAdmin || voterInfo.canRegisterCandidates;
+                } catch (error) {
+                    console.log('Cannot check canRegisterCandidates, using admin status only');
+                }
+                
+                // Tất cả tabs đều hiển thị luôn - không cần kiểm tra quyền ở đây
+                console.log('User permissions - Admin:', isAdmin, 'Can register:', canRegisterCandidates);
+                
+                // Không cần kiểm tra quyền nữa - tất cả tabs đều hiển thị
+                // Chỉ cần kiểm tra khi người dùng thực hiện hành động cụ thể
+                
+                // Update UI
+                document.getElementById('statusText').textContent = 'Đã kết nối';
+                document.getElementById('statusText').className = 'status-connected';
+                document.getElementById('accountAddress').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+                document.getElementById('connectWallet').style.display = 'none';
+                
+                // Ẩn thông báo hướng dẫn
+                const walletNotice = document.getElementById('walletNotice');
+                if (walletNotice) {
+                    walletNotice.style.display = 'none';
+                }
+                
+                let adminMessage = '';
+                if (isAdmin) {
+                    adminMessage = '\n\n🔑 Bạn là Admin - Có quyền truy cập đầy đủ các chức năng quản trị!';
+                } else if (canRegisterCandidates) {
+                    adminMessage = '\n\n✅ Bạn có quyền đăng ký làm ứng viên!';
+                }
+                
+                alert('✅ Kết nối thành công!' + adminMessage);
+                
+                // Load dữ liệu ngay sau khi kết nối
+                await loadElectionData();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Lỗi: ' + error.message);
+            }
+        }
+        
+        // Load dữ liệu bầu cử
+        async function loadElectionData() {
+            if (!contract || !userAccount) {
+                console.warn('Contract or account not initialized');
+                return;
+            }
+            try {
+                const state = await contract.methods.state().call();
+                const stateNames = ['Thiết lập', 'Đăng ký ứng viên', 'Đang bỏ phiếu', 'Đã kết thúc'];
+                const electionStateEl = document.getElementById('electionState');
+                if (electionStateEl) electionStateEl.textContent = stateNames[state];
+                
+                const candidates = await contract.methods.getCandidates().call();
+                const candidateCountEl = document.getElementById('candidateCount');
+                if (candidateCountEl) candidateCountEl.textContent = candidates.length;
+                
+                const totalVotes = await contract.methods.getTotalVotes().call();
+                const totalVotesEl = document.getElementById('totalVotes');
+                if (totalVotesEl) totalVotesEl.textContent = totalVotes;
+                
+                const voterInfo = await contract.methods.voters(userAccount).call();
+                const voterStatusEl = document.getElementById('voterStatus');
+                if (voterStatusEl) {
+                    if (!voterInfo.isRegistered) {
+                        voterStatusEl.textContent = 'Chưa đăng ký';
+                    } else if (voterInfo.hasVoted) {
+                        voterStatusEl.textContent = 'Đã bỏ phiếu';
+                    } else {
+                        voterStatusEl.textContent = 'Có thể bỏ phiếu';
+                    }
+                }
+                
+                await loadCandidates();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Don't show alert to user, just log it
+            }
+        }
+        
+        // Load danh sách ứng viên
+        async function loadCandidates() {
+            if (!contract || !userAccount) {
+                console.warn('Contract or account not initialized');
+                return;
+            }
+            try {
+                const candidates = await contract.methods.getCandidates().call();
+                const candidatesListDiv = document.getElementById('candidatesList');
+                if (!candidatesListDiv) {
+                    console.warn('Candidates list div not found');
+                    return;
+                }
+                
+                if (candidates.length === 0) {
+                    candidatesListDiv.innerHTML = '<p class="empty-state">Chưa có ứng viên nào</p>';
+                    return;
+                }
+                
+                const voterInfo = await contract.methods.voters(userAccount).call();
+                const canVote = voterInfo.isRegistered && !voterInfo.hasVoted;
+                
+                candidatesListDiv.innerHTML = candidates.map(candidate => `
+                    <div class="candidate-card">
+                        <h3>${candidate.name}</h3>
+                        <p class="candidate-position">${candidate.position}</p>
+                        <p class="candidate-votes">${candidate.voteCount} phiếu</p>
+                        ${canVote ? `<button onclick="voteForCandidate(${candidate.id})" class="btn btn-primary">Bầu cho ứng viên này</button>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+            }
+        }
+        
+        // Bỏ phiếu
+        async function voteForCandidate(candidateId) {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            if (!confirm('Bạn có chắc muốn bỏ phiếu cho ứng viên này?')) return;
+            try {
+                await contract.methods.vote(candidateId).send({ from: userAccount });
+                alert('✅ Bỏ phiếu thành công!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Load kết quả
+        async function loadResults() {
+            if (!contract) return;
+            try {
+                const results = await contract.methods.getResults().call();
+                const resultsDiv = document.getElementById('resultsList');
+                if (!resultsDiv) return;
+                
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<p class="empty-state">Chưa có kết quả</p>';
+                    return;
+                }
+                
+                const sortedResults = [...results].sort((a, b) => Number(b.voteCount) - Number(a.voteCount));
+                resultsDiv.innerHTML = sortedResults.map((candidate, index) => `
+                    <div class="result-card ${index === 0 ? 'winner' : ''}">
+                        <div class="result-rank">#${index + 1}</div>
+                        <div class="result-info">
+                            <h3>${candidate.name}</h3>
+                            <p>${candidate.position}</p>
+                        </div>
+                        <div class="result-votes">
+                            <span class="vote-count">${candidate.voteCount}</span>
+                            <span class="vote-label">phiếu</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+        
+        // Đăng ký ứng cử
+        async function registerAsCandidate(e) {
+            e.preventDefault();
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            const name = document.getElementById('candidateName').value.trim();
+            const position = document.getElementById('candidatePosition').value;
+            
+            if (!name || !position) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+            
+            try {
+                console.log('Calling registerCandidate:', name, position);
+                console.log('From account:', userAccount);
+                const state = await contract.methods.state().call();
+                const voter = await contract.methods.voters(userAccount).call();
+                console.log('Current state:', state, 'Voter registered:', voter.isRegistered);
+                
+                await contract.methods.registerCandidate(name, position).send({ from: userAccount });
+                alert('✅ Đăng ký ứng cử thành công!');
+                document.getElementById('candidateForm').reset();
+                await loadElectionData();
+                switchTab('voting');
+            } catch (error) {
+                console.error('Lỗi:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin functions
+        async function startRegistration() {
+            if (!contract) return;
+            try {
+                console.log('Calling startRegistration from account:', userAccount);
+                const state = await contract.methods.state().call();
+                console.log('Current state before startRegistration:', state);
+                
+                await contract.methods.startRegistration().send({ from: userAccount });
+                alert('✅ Đã bắt đầu đăng ký!');
+                await loadElectionData();
+            } catch (error) {
+                console.error('Error in startRegistration:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        async function startVoting() {
+            if (!contract) return;
+            try {
+                await contract.methods.startVoting().send({ from: userAccount });
+                alert('✅ Đã bắt đầu bỏ phiếu!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        async function endElection() {
+            if (!contract) return;
+            if (!confirm('Bạn có chắc muốn kết thúc bầu cử?')) return;
+            try {
+                await contract.methods.endElection().send({ from: userAccount });
+                alert('✅ Đã kết thúc bầu cử!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        async function registerVoter() {
+            const address = document.getElementById('voterAddress').value.trim();
+            if (!address) {
+                alert('Vui lòng nhập địa chỉ!');
+                return;
+            }
+            try {
+                console.log('Calling registerVoter for address:', address);
+                console.log('From account:', userAccount);
+                const state = await contract.methods.state().call();
+                console.log('Current state:', state);
+                
+                await contract.methods.registerVoter(address).send({ from: userAccount });
+                alert('✅ Đăng ký cử tri thành công!');
+                document.getElementById('voterAddress').value = '';
+                await loadElectionData();
+            } catch (error) {
+                console.error('Error in registerVoter:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        async function registerMultipleVoters() {
+            const addresses = document.getElementById('voterAddresses').value.trim().split('\n').filter(a => a.trim());
+            if (addresses.length === 0) {
+                alert('Vui lòng nhập địa chỉ!');
+                return;
+            }
+            try {
+                await contract.methods.registerVoters(addresses).send({ from: userAccount });
+                alert(`✅ Đã đăng ký ${addresses.length} cử tri! (Có quyền đăng ký ứng viên)`);
+                document.getElementById('voterAddresses').value = '';
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        async function addCandidateAdmin() {
+            const name = document.getElementById('adminCandidateName').value.trim();
+            const position = document.getElementById('adminCandidatePosition').value;
+            if (!name) {
+                alert('Vui lòng nhập tên!');
+                return;
+            }
+            try {
+                await contract.methods.addCandidate(name, position).send({ from: userAccount });
+                alert('✅ Đã thêm ứng viên!');
+                document.getElementById('adminCandidateName').value = '';
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Load danh sách users từ MongoDB
+        async function loadUsersFromMongoDB() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/users', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Không thể tải danh sách users');
+                }
+                
+                const result = await response.json();
+                const users = result.data;
+                
+                const usersListDiv = document.getElementById('usersList');
+                
+                if (!users || users.length === 0) {
+                    usersListDiv.innerHTML = '<p class="empty-state">Chưa có sinh viên nào</p>';
+                    return;
+                }
+                
+                usersListDiv.innerHTML = users.map(user => `
+                    <div class="candidate-card" style="margin-bottom: 15px;">
+                        <h4>${user.username} ${user.role === 'admin' ? '👑' : ''}</h4>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p><strong>Wallet:</strong> ${user.walletAddress}</p>
+                        <p><strong>Vai trò:</strong> ${user.role === 'admin' ? 'Admin' : 'Sinh viên'}</p>
+                        <button onclick="registerVoterFromUser('${user.walletAddress}')" class="btn btn-primary btn-small">
+                            ✅ Đăng ký vào Blockchain
+                        </button>
+                    </div>
+                `).join('');
+                
+                alert(`✅ Đã tải ${users.length} sinh viên từ MongoDB!`);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Lỗi: ' + error.message + '\n\nĐảm bảo backend đang chạy tại http://localhost:5000');
+            }
+        }
+        
+        // Đăng ký cử tri từ user MongoDB
+        async function registerVoterFromUser(walletAddress) {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            if (!confirm(`Đăng ký địa chỉ ${walletAddress} vào blockchain?`)) {
+                return;
+            }
+            
+            try {
+                await contract.methods.registerVoter(walletAddress).send({ from: userAccount });
+                alert('✅ Đã đăng ký cử tri vào blockchain!');
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            console.log('=== switchTab called with:', tabName);
+            
+            const targetTab = document.getElementById(tabName);
+            const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
+            
+            console.log('Target tab element:', targetTab);
+            console.log('Target button element:', targetButton);
+            
+            if (!targetTab || !targetButton) {
+                console.error('Tab or button not found:', tabName);
+                return;
+            }
+            
+            // Kiểm tra xem button có đang bị ẩn không (không có quyền)
+            const buttonStyle = window.getComputedStyle(targetButton);
+            console.log('Button display style:', buttonStyle.display);
+            
+            if (buttonStyle.display === 'none') {
+                alert('⛔ Bạn không có quyền truy cập tab này!');
+                return;
+            }
+            
+            // ẨN TẤT CẢ các tab content - FORCE REMOVE ACTIVE
+            const allTabs = document.querySelectorAll('.tab-content');
+            allTabs.forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none'; // Force ẩn
+                console.log('Hidden tab:', tab.id);
+            });
+            
+            // Remove active từ tất cả buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // CHỈ HIỂN THỊ tab được chọn
+            targetTab.classList.add('active');
+            targetTab.style.display = 'block'; // Force hiển thị
+            targetButton.classList.add('active');
+            
+            console.log('Switched to tab:', tabName, 'Tab classes:', targetTab.className);
+            
+            if (tabName === 'results') {
+                loadResults();
+            } else if (tabName === 'voting') {
+                loadElectionData();
+            }
+        }
+        
+        // ẨN LOADING OVERLAY NGAY KHI LOAD TRANG
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+            
+            // Đảm bảo tất cả nút có thể click
+            const allButtons = document.querySelectorAll('button');
+            allButtons.forEach(btn => {
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+                btn.style.position = 'relative';
+                btn.style.zIndex = '10';
+            });
+            
+            // Attach event listeners cho tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    console.log('Tab button clicked:', button.dataset.tab);
+                    switchTab(button.dataset.tab);
+                });
+            });
+            
+            // Form submit
+            const candidateForm = document.getElementById('candidateForm');
+            if (candidateForm) {
+                candidateForm.addEventListener('submit', registerAsCandidate);
+            }
+            
+            // FORCE HIỂN THỊ TẤT CẢ TABS - Đảm bảo không bị CSS hay JS nào ẩn
+            setTimeout(() => {
+                console.log('FORCING ALL TABS TO SHOW...');
+                document.querySelectorAll('.tab-button.admin-only, .tab-button.can-register').forEach(btn => {
+                    btn.style.display = 'inline-block';
+                    btn.style.visibility = 'visible';
+                    btn.style.opacity = '1';
+                    console.log('Forced show:', btn.textContent);
+                });
+                console.log('All tabs forced to show!');
+            }, 100);
+            
+            // Connect wallet button - đã dùng onclick trong HTML, không cần addEventListener
+            console.log('Page loaded and ready');
+        });
+    </script>
+    <script>
+        // Kiểm tra đăng nhập
+        function checkAuth() {
+            const currentUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+            if (!currentUser) {
+                // Chỉ redirect nếu không phải đang ở trang hiện tại
+                if (!window.location.href.includes('login.html')) {
+                    setTimeout(() => {
+                        const stillNoUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+                        if (!stillNoUser) {
+                            window.location.href = 'login.html';
+                        }
+                    }, 1000);
+                }
+                return null;
+            } else {
+                const user = JSON.parse(currentUser);
+                console.log('Logged in as:', user.username);
+                
+                // Hiển thị thông tin user - CHỈ KHI ELEMENT TỒN TẠI
+                const userNameEl = document.getElementById('userName');
+                const userRoleEl = document.getElementById('userRole');
+                
+                if (userNameEl) {
+                    userNameEl.textContent = user.fullName;
+                }
+                if (userRoleEl) {
+                    userRoleEl.textContent = user.role === 'admin' ? 'Quản trị viên' : 'Sinh viên - ' + user.studentId;
+                }
+                
+                return user;
+            }
+        }
+        
+        // Logout & Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = checkAuth();
+            
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                        sessionStorage.removeItem('current_user');
+                        localStorage.removeItem('current_user');
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+            
+            // Refresh results button
+            const refreshBtn = document.getElementById('refreshResults');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadResults);
+            }
+        });
+    </script>
+</body>
+</html>
