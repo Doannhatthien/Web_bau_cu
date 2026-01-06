@@ -71,7 +71,8 @@ contract ClassElection {
     }
     
     // Đăng ký cử tri
-    function registerVoter(address _voter) public onlyAdmin inState(ElectionState.Setup) {
+    function registerVoter(address _voter) public onlyAdmin {
+        require(state == ElectionState.Setup || state == ElectionState.Registration, "Khong the dang ky cu tri o trang thai nay");
         require(!voters[_voter].isRegistered, "Cu tri da duoc dang ky");
         voters[_voter].isRegistered = true;
         voters[_voter].canRegisterCandidates = true;
@@ -80,7 +81,8 @@ contract ClassElection {
     }
     
     // Đăng ký nhiều cử tri cùng lúc
-    function registerVoters(address[] memory _voters) public onlyAdmin inState(ElectionState.Setup) {
+    function registerVoters(address[] memory _voters) public onlyAdmin {
+        require(state == ElectionState.Setup || state == ElectionState.Registration, "Khong the dang ky cu tri o trang thai nay");
         for (uint i = 0; i < _voters.length; i++) {
             if (!voters[_voters[i]].isRegistered) {
                 voters[_voters[i]].isRegistered = true;

@@ -247,7 +247,7 @@ const CONTRACT_ABI = [
 ];
 
 // Địa chỉ contract - Cần deploy và thay thế
-const CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'; // Thay bằng địa chỉ contract sau khi deploy
+const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3'; // Thay bằng địa chỉ contract sau khi deploy
 
 // State mapping
 const STATE_NAMES = ['Thiết lập', 'Đăng ký', 'Bỏ phiếu', 'Kết thúc'];
@@ -425,7 +425,18 @@ async function loadElectionData() {
         if (voterInfo.isRegistered) {
             voterStatus = voterInfo.hasVoted ? 'Đã bỏ phiếu' : 'Chưa bỏ phiếu';
         }
-        document.getElementById('voterStatus').textContent = voterStatus;
+        const voterStatusEl = document.getElementById('voterStatus');
+        voterStatusEl.textContent = voterStatus;
+        
+        // Add quick register button if not registered and not admin
+        if (!voterInfo.isRegistered && !isAdmin && state >= 1 && state < 3) {
+            voterStatusEl.innerHTML = `
+                <span style="color: #ff9800;">Chưa đăng ký</span>
+                <button onclick="quickRegisterSelf()" style="margin-left: 10px; padding: 5px 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9em;">
+                    ⚡ Đăng ký ngay
+                </button>
+            `;
+        }
         
         // Load candidates
         await loadCandidates();
@@ -678,6 +689,49 @@ async function registerMultipleVoters() {
     }
 }
 
+// Quick register self (for voters)
+async function quickRegisterSelf() {
+    try {
+        showLoading();
+        
+        // Check if admin
+        const adminAddress = await contract.methods.admin().call();
+        if (userAccount.toLowerCase() === adminAddress.toLowerCase()) {
+            throw new Error('Admin không cần đăng ký làm cử tri');
+        }
+        
+        // Register self
+        await contract.methods.registerVoter(userAccount).send({ 
+            from: userAccount,
+            gas: 200000 
+        });
+        
+        hideLoading();
+        showAlert('✅ Đăng ký làm cử tri thành công!', 'success');
+        
+        // Reload data
+        await loadElectionData();
+        
+    } catch (error) {
+        hideLoading();
+        console.error('Error self-registering:', error);
+        
+        let errorMsg = 'Lỗi đăng ký: ' + error.message;
+        
+        // Check specific errors
+        if (error.message.includes('Only admin')) {
+            errorMsg = '❌ Chỉ admin mới có thể đăng ký cử tri. Vui lòng liên hệ quản trị viên!';
+        } else if (error.message.includes('Already registered')) {
+            errorMsg = '✅ Bạn đã được đăng ký làm cử tri rồi!';
+            await loadElectionData();
+        } else if (error.message.includes('Not in registration state')) {
+            errorMsg = '❌ Hiện không trong giai đoạn đăng ký cử tri!';
+        }
+        
+        showAlert(errorMsg, 'error');
+    }
+}
+
 async function addCandidateAdmin() {
     try {
         showLoading();
@@ -707,23 +761,58 @@ async function addCandidateAdmin() {
 async function startRegistration() {
     try {
         showLoading();
-        await contract.methods.startRegistration().send({ from: userAccount });
+        
+        // Check current state
+        const currentState = await contract.methods.state().call();
+        console.log('Current state:', currentState);
+        
+        if (currentState != 0) {
+            throw new Error('Chỉ có thể bắt đầu đăng ký khi ở trạng thái Thiết lập (hiện tại: ' + STATE_NAMES[currentState] + ')');
+        }
+        
+        await contract.methods.startRegistration().send({ 
+            from: userAccount,
+            gas: 300000 
+        });
+        
         hideLoading();
-        showAlert('Đã bắt đầu giai đoạn đăng ký ứng viên!', 'success');
+        showAlert('✅ Đã bắt đầu giai đoạn đăng ký ứng viên!', 'success');
         await loadElectionData();
+        
     } catch (error) {
         hideLoading();
         console.error('Error starting registration:', error);
-        showAlert('Lỗi: ' + error.message, 'error');
+        
+        let errorMsg = 'Lỗi bắt đầu đăng ký: ';
+        if (error.message.includes('Only admin')) {
+            errorMsg += 'Chỉ admin mới có quyền thực hiện!';
+        } else if (error.message.includes('trạng thái')) {
+            errorMsg = error.message;
+        } else {
+            errorMsg += error.message;
+        }
+        
+        showAlert(errorMsg, 'error');
     }
 }
 
 async function startVoting() {
     try {
         showLoading();
-        await contract.methods.startVoting().send({ from: userAccount });
+        
+        // Check current state
+        const currentState = await contract.methods.state().call();
+        if (currentState != 1) {
+            throw new Error('Chỉ có thể bắt đầu bỏ phiếu khi ở trạng thái Đăng ký (hiện tại: ' + STATE_NAMES[currentState] + ')');
+        }
+        
+        await contract.methods.startVoting().send({ 
+            from: userAccount,
+            gas: 300000 
+        });
+        
         hideLoading();
-        showAlert('Đã bắt đầu bỏ phiếu!', 'success');
+        showAlert('✅ Đã bắt đầu bỏ phiếu!', 'success');
         await loadElectionData();
     } catch (error) {
         hideLoading();

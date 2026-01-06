@@ -25,7 +25,8 @@ function initializeAuth() {
                 password: 'admin123',
                 fullName: 'Quản trị viên',
                 studentId: 'ADMIN001',
-                role: 'admin'
+                role: 'admin',
+                walletAddress: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
             },
             {
                 id: 2,
@@ -33,7 +34,17 @@ function initializeAuth() {
                 password: '123456',
                 fullName: 'Nguyễn Văn A',
                 studentId: 'SV001',
-                role: 'student'
+                role: 'student',
+                walletAddress: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8'
+            },
+            {
+                id: 3,
+                username: 'student2',
+                password: '123456',
+                fullName: 'Nguyễn Văn B',
+                studentId: 'SV002',
+                role: 'student',
+                walletAddress: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'
             }
         ];
         localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleUsers));
