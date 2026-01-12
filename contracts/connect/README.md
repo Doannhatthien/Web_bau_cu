@@ -1,52 +1,93 @@
-# Hệ Thống Bầu Cử Lớp - Blockchain
+# Web Bầu Cử Lớp - Blockchain
 
-🗳️ Hệ thống bầu cử lớp online dựa trên công nghệ Blockchain - Minh bạch & Bảo mật
+Hệ thống bầu cử trực tuyến dựa trên công nghệ Blockchain, đảm bảo tính minh bạch và bảo mật.
 
-## ✨ Tính năng
+## 📁 Cấu trúc Project
 
-- 🔐 **Đăng nhập/Đăng ký** - Xác thực người dùng an toàn
-- 👥 **Quản lý ứng viên** - Đăng ký và hiển thị danh sách ứng viên
-- 🗳️ **Bỏ phiếu** - Hệ thống bỏ phiếu minh bạch
-- 📊 **Kết quả real-time** - Xem kết quả bầu cử trực tiếp
-- 👑 **Quản trị** - Dashboard dành cho admin
-- 🎨 **Giao diện đẹp** - Màu sắc hiện đại (cam, hồng, đỏ, xanh lá)
+Project được tổ chức theo các nhánh chuyên biệt:
 
-## 🚀 Cài đặt
+### 🎨 Nhánh `Frontend`
+Chứa toàn bộ giao diện người dùng và các tính năng bầu cử:
+- **Hệ thống đăng nhập/đăng ký** với xác thực người dùng
+- **Bầu cử công khai** - Mọi người có thể tham gia
+- **Bầu cử khép kín** - Yêu cầu mật khẩu (chỉ admin quản lý)
+- **Trang cấu hình admin** - Quản lý chế độ bầu cử
+- **Auto-start server** - Tự động chạy khi khởi động máy
 
-### Yêu cầu
-- Node.js (v18+)
-- npm hoặc yarn
+📂 Chi tiết: `contracts/Frontend/`
 
-### Cài đặt dependencies
+### ⚙️ Nhánh `backend`
+Chứa Smart Contract và logic Blockchain:
+- Smart Contract viết bằng Solidity
+- Cấu hình Hardhat
+- Scripts deploy và test
+- ABI và artifacts
+
+📂 Chi tiết: `contracts/`, `scripts/`, `test/`
+
+### 🌿 Nhánh `main`
+Nhánh chính chỉ chứa cấu trúc cơ bản và tài liệu hướng dẫn.
+
+## 🚀 Hướng dẫn sử dụng
+
+### Clone repository:
 ```bash
+git clone https://github.com/Doannhatthien/Web_bau_cu.git
+cd Web_bau_cu
+```
+
+### Làm việc với Frontend:
+```bash
+git checkout Frontend
+cd contracts/Frontend
 npm install
 ```
 
-## 💻 Chạy ứng dụng
-
-### Chạy web server
+### Chạy web server:
 ```bash
-# Cách 1: Sử dụng npm
-npm run serve
-
-# Cách 2: Click file .bat
-start-server.bat
-# hoặc
+# Windows
+cd contracts/connect
 RUN-WEB.bat
 ```
 
-Server sẽ chạy tại: `http://localhost:8000`
-
-### Chạy blockchain node (tùy chọn)
+### Làm việc với Backend:
 ```bash
-# Terminal 1: Chạy Hardhat node
-npm run node
-
-# Terminal 2: Deploy smart contract
-npm run deploy:localhost
+git checkout backend
+npm install
+npx hardhat compile
+npx hardhat test
 ```
 
-## 🔑 Tài khoản demo
+## 🔧 Công nghệ sử dụng
+
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Blockchain**: Solidity, Hardhat, Ethers.js
+- **Server**: Node.js, http-server
+- **Version Control**: Git, GitHub
+
+## 👥 Tính năng chính
+
+### 🔐 Xác thực & Bảo mật
+- Hệ thống đăng nhập/đăng ký
+- Phân quyền Admin/User
+- Lưu trữ session an toàn với localStorage
+
+### 🗳️ Chế độ bầu cử
+1. **Công khai**: Mọi người tự do tham gia
+2. **Khép kín**: Cần mật khẩu do admin cấp
+
+### 📊 Quản lý
+- Đăng ký ứng viên
+- Theo dõi kết quả real-time
+- Thống kê số phiếu bầu
+- Quản lý trạng thái bầu cử (Admin)
+
+## 📱 Truy cập hệ thống
+
+- **Local**: http://localhost:8000/login.html
+- **Network**: http://[YOUR_IP]:8000/login.html
+
+## 👤 Tài khoản mặc định
 
 **Admin:**
 - Username: `admin`
@@ -56,46 +97,10 @@ npm run deploy:localhost
 - Username: `student1`
 - Password: `123456`
 
-## 📁 Cấu trúc thư mục
-
-```
-BLOCKCHAIN/
-├── contracts/           # Smart contracts (Solidity)
-├── scripts/            # Deploy scripts
-├── test/               # Test files
-├── artifacts/          # Compiled contracts
-├── login.html          # Trang đăng nhập
-├── index.html          # Trang chính
-├── style.css           # CSS trang chính
-├── login.css           # CSS trang đăng nhập
-├── auth.js             # Xác thực người dùng
-├── app.js              # Logic ứng dụng
-└── hardhat.config.js   # Cấu hình Hardhat
-```
-
-## 🌐 Chia sẻ qua mạng LAN
-
-Để chia sẻ với máy khác trong cùng mạng:
-
-1. Chạy `start-server.bat`
-2. Lấy link hiển thị (ví dụ: `http://192.168.x.x:8000/login.html`)
-3. Chia sẻ link cho người khác
-
-## 🛠️ Công nghệ sử dụng
-
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Blockchain**: Ethereum, Solidity, Hardhat
-- **Web3**: Web3.js
-- **Server**: http-server (Node.js)
-
 ## 📝 License
 
-MIT License
-
-## 👨‍💻 Tác giả
-
-Phát triển bởi nhóm sinh viên
+© 2025 - Hệ Thống Bầu Cử Lớp Blockchain
 
 ---
 
-⭐ Nếu thấy hữu ích, hãy cho project một star nhé!
+**Lưu ý**: Để làm việc với các tính năng cụ thể, vui lòng checkout sang nhánh tương ứng (Frontend hoặc backend).

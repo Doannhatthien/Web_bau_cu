@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:contracts/Frontend/package.json
 {
   "name": "class-election-blockchain",
   "version": "1.0.0",
@@ -30,3 +31,6 @@
     "test": "test"
   }
 }
+========
+
+>>>>>>>> origin/backend:package.json

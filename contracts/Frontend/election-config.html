@@ -239,7 +239,7 @@
                 </div>
 
                 <div class="button-group" style="margin-top: 20px;">
-                    <button id="activatePrivate" class="btn btn-danger btn-activate">
+                    <button id="activatePrivate" class="btn btn-danger btn-activate" onclick="window.location.href='private-voting.html'">
                         🔒 Kích hoạt chế độ Khép kín
                     </button>
                     <button id="deactivatePrivate" class="btn btn-secondary btn-activate" style="display: none;">
@@ -286,7 +286,36 @@
         </footer>
     </div>
 
-    <script src="auth.js"></script>
-    <script src="election-config.js"></script>
+    <script>
+        // Đơn giản hóa - chỉ xử lý auth và logout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check auth
+            const currentUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const user = JSON.parse(currentUser);
+            if (user.role !== 'admin') {
+                alert('⚠️ Chỉ admin mới có quyền truy cập!');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Hiển thị thông tin user
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('userName').textContent = user.fullName;
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                    sessionStorage.removeItem('current_user');
+                    localStorage.removeItem('current_user');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

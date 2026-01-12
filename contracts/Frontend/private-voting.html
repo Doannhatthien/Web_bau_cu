@@ -18,12 +18,15 @@
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         .lock-icon {
             font-size: 5em;
             margin-bottom: 20px;
             animation: lockPulse 2s ease-in-out infinite;
+            pointer-events: none;
         }
 
         @keyframes lockPulse {
@@ -46,6 +49,10 @@
             letter-spacing: 5px;
             font-weight: bold;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 100;
+            background: white;
+            cursor: text;
         }
 
         .password-input:focus {
@@ -119,15 +126,181 @@
             margin: 30px 0;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
+
+        /* Tab Navigation Styles */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #E0E0E0;
+            padding-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 15px 30px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            margin-bottom: -3px;
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .admin-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-buttons button {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .results-list {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .result-card.winner {
+            border: 3px solid gold;
+            background: linear-gradient(135deg, #FFF9E6, #FFECB3);
+        }
+
+        .result-rank {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--dark-color);
+        }
+
+        .result-info p {
+            margin: 0;
+            color: #666;
+        }
+
+        .result-votes {
+            text-align: center;
+        }
+
+        .vote-count {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .vote-label {
+            display: block;
+            color: #999;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🔒 Bầu Cử Khép Kín</h1>
-            <p class="subtitle">Chế độ bảo mật cao - Yêu cầu mật khẩu</p>
+            <p class="subtitle">Yêu cầu mật khẩu</p>
             
-            <div class="user-info" id="userInfo" style="display: none;">
+            <div class="user-info" id="userInfo">
                 <div class="user-details">
                     <div class="user-avatar">👤</div>
                     <div class="user-text">
@@ -137,124 +310,200 @@
                 </div>
                 <button class="logout-btn" id="logoutBtn">Đăng xuất</button>
             </div>
+            
+            <!-- Kết nối -->
+            <div class="connection-status" id="connectionStatus">
+                <div class="status-item">
+                    <span>🔗</span>
+                    <span id="statusText" class="status-disconnected">Chưa kết nối</span>
+                </div>
+                <div class="status-item">
+                    <span>💳</span>
+                    <span id="accountAddress">Chưa kết nối</span>
+                </div>
+            </div>
+            
+            <button id="connectWallet" class="btn btn-primary btn-large" style="background: #FF9800; font-size: 1.2em; padding: 18px 40px; box-shadow: 0 5px 20px rgba(255,152,0,0.4); position: relative; z-index: 1000; cursor: pointer; pointer-events: auto;">
+                🦊 KẾT NỐI METAMASK
+            </button>
         </header>
 
         <div class="private-voting-container">
-            <!-- Back button -->
-            <button onclick="window.location.href='index.html'" class="btn btn-secondary" style="margin-bottom: 20px;">
-                ← Quay lại trang chính
-            </button>
+            <!-- Chế độ bầu cử -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button onclick="window.location.href='index.html'" class="btn btn-primary" style="flex: 1; min-width: 180px;">
+                    🌐 Bầu cử Công khai
+                </button>
+                <button onclick="location.reload()" class="btn btn-danger" style="flex: 1; min-width: 180px;">
+                    🔒 Bầu cử Khép kín
+                </button>
+            </div>
 
             <!-- Lock Screen -->
-            <div class="lock-screen" id="lockScreen">
+            <div class="lock-screen" id="lockScreen" style="position: relative; z-index: 10;">
                 <div class="lock-icon">🔐</div>
-                <h2 style="color: var(--danger-color); margin-bottom: 10px;">Khu vực bảo mật</h2>
-                <p style="color: #666; font-size: 1.1em; margin-bottom: 30px;">
-                    Đây là phiên bầu cử khép kín. Vui lòng nhập mật khẩu để tiếp tục.
-                </p>
-
-                <div class="security-notice">
-                    <strong>🔒 Lưu ý bảo mật:</strong>
-                    <ul style="text-align: left; margin-top: 10px; line-height: 1.8;">
-                        <li>Mật khẩu chỉ được admin cung cấp</li>
-                        <li>Không chia sẻ mật khẩu với người không liên quan</li>
-                        <li>Mỗi tài khoản chỉ được bỏ phiếu 1 lần</li>
-                        <li>Phiếu bầu của bạn được bảo mật tuyệt đối</li>
-                    </ul>
-                </div>
+                <h2 style="color: var(--danger-color); margin-bottom: 10px;">Nhập mật khẩu</h2>
 
                 <div class="password-input-group">
                     <input 
-                        type="password" 
+                        type="text"
                         id="electionPasswordInput" 
                         class="password-input" 
-                        placeholder="••••••••"
+                        placeholder="Nhập: mật khẩu"
                         maxlength="20"
+                        autocomplete="off"
+                        style="position: relative; z-index: 100; pointer-events: auto; cursor: text; user-select: auto;"
                     >
                     <p id="passwordError" style="color: var(--danger-color); margin-top: 10px; display: none;">
-                        ❌ Mật khẩu không chính xác!
+                        ❌ Sai mật khẩu!
                     </p>
                 </div>
 
-                <button id="unlockVoting" class="btn btn-danger btn-large" style="max-width: 400px; margin: 20px auto;">
-                    🔓 Mở khóa và Bỏ phiếu
+                <button id="unlockVoting" class="btn btn-danger btn-large" style="max-width: 400px; margin: 20px auto; position: relative; z-index: 100; cursor: pointer; pointer-events: auto; display: block;">
+                    🔓 MỞ KHÓA
                 </button>
-
-                <p style="color: #999; margin-top: 20px; font-size: 0.9em;">
-                    Liên hệ admin nếu bạn chưa có mật khẩu
-                </p>
             </div>
 
             <!-- Voting Area (Hidden initially) -->
             <div class="voting-area" id="votingArea">
-                <div class="section">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                        <span style="font-size: 2em;">✅</span>
-                        <div>
-                            <h2 style="margin: 0; color: var(--secondary-color);">Xác thực thành công!</h2>
-                            <p style="margin: 5px 0 0 0; color: #666;">Bạn có thể bỏ phiếu ngay bây giờ</p>
-                        </div>
-                    </div>
-
-                    <div class="security-notice">
-                        <strong>🔒 Phiếu bầu của bạn hoàn toàn bí mật</strong>
-                        <p style="margin-top: 10px; color: #666;">
-                            Không ai có thể biết bạn đã bầu cho ai. Hệ thống chỉ ghi nhận rằng bạn đã tham gia bỏ phiếu.
-                        </p>
-                    </div>
+                <!-- Tab Navigation -->
+                <div class="tabs" id="tabs">
+                    <button class="tab-button active" data-tab="voting">Bỏ Phiếu</button>
+                    <button class="tab-button" data-tab="results">Kết Quả</button>
+                    <button class="tab-button" data-tab="registration">Đăng Ký Ứng Viên</button>
+                    <button class="tab-button admin-only" data-tab="admin">Quản Trị</button>
                 </div>
 
-                <div class="section">
-                    <h2>👥 Danh Sách Ứng Viên</h2>
-                    <p style="color: #666; margin-bottom: 20px;">Click vào ứng viên để chọn, sau đó xác nhận bầu cử bên dưới</p>
-                    
-                    <div id="candidatesListPrivate">
-                        <!-- Candidates will be loaded here -->
-                    </div>
-                </div>
-
-                <div class="vote-confirm-section" id="voteConfirmSection" style="display: none;">
-                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">📝 Xác nhận lựa chọn của bạn</h3>
-                    
-                    <div style="background: #F5F5F5; padding: 20px; border-radius: 10px; margin: 15px 0;">
-                        <p style="color: #666; margin-bottom: 10px;">Bạn đã chọn:</p>
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <span style="font-size: 2em;">👤</span>
-                            <div>
-                                <h3 id="selectedCandidateName" style="margin: 0; color: var(--dark-color);">-</h3>
-                                <p id="selectedCandidatePosition" style="margin: 5px 0 0 0; color: #666;">-</p>
+                <!-- Voting Tab -->
+                <div class="tab-content active" id="voting">
+                    <div class="section">
+                        <h2>🎯 Thông Tin Bầu Cử</h2>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h3>Trạng thái bầu cử</h3>
+                                <p id="electionState" class="state-text">-</p>
+                            </div>
+                            <div class="info-card">
+                                <h3>Số ứng viên</h3>
+                                <p id="candidateCount" class="count-text">0</p>
+                            </div>
+                            <div class="info-card">
+                                <h3>Tổng số phiếu</h3>
+                                <p id="totalVotes" class="count-text">0</p>
+                            </div>
+                            <div class="info-card">
+                                <h3>Trạng thái của bạn</h3>
+                                <p id="voterStatus" class="status-text">-</p>
                             </div>
                         </div>
                     </div>
 
-                    <div style="background: #FFF3E0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid var(--warning-color);">
-                        <strong style="color: var(--warning-color);">⚠️ Lưu ý:</strong>
-                        <p style="margin-top: 8px; color: #666;">
-                            Sau khi xác nhận, bạn KHÔNG THỂ thay đổi lựa chọn. Vui lòng kiểm tra kỹ trước khi bấm nút xác nhận.
-                        </p>
-                    </div>
-
-                    <div class="button-group">
-                        <button id="confirmVoteBtn" class="btn btn-success" style="flex: 2;">
-                            ✓ Xác nhận Bầu cử
-                        </button>
-                        <button id="cancelVoteBtn" class="btn btn-secondary" style="flex: 1;">
-                            ✕ Hủy
-                        </button>
+                    <div class="section">
+                        <h2>👥 Danh Sách Ứng Viên</h2>
+                        <div id="candidatesList" class="candidates-list">
+                            <p class="empty-state">Chưa có ứng viên nào</p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Already Voted Notice -->
-                <div class="section" id="alreadyVotedNotice" style="display: none;">
-                    <div style="text-align: center; padding: 40px;">
-                        <div style="font-size: 5em; margin-bottom: 20px;">✅</div>
-                        <h2 style="color: var(--secondary-color);">Bạn đã bỏ phiếu!</h2>
-                        <p style="color: #666; font-size: 1.1em; margin-top: 10px;">
-                            Cảm ơn bạn đã tham gia bầu cử. Phiếu bầu của bạn đã được ghi nhận.
-                        </p>
-                        <button onclick="window.location.href='index.html'" class="btn btn-primary" style="margin-top: 20px;">
-                            Xem kết quả bầu cử
-                        </button>
+                <!-- Results Tab -->
+                <div class="tab-content" id="results">
+                    <div class="section">
+                        <h2>📊 Kết Quả Bầu Cử</h2>
+                        <button id="refreshResults" class="btn btn-secondary">Làm mới kết quả</button>
+                        <div id="resultsList" class="results-list">
+                            <p class="empty-state">Chưa có kết quả</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Tab -->
+                <div class="tab-content" id="registration">
+                    <div class="section">
+                        <h2>📝 Đăng Ký Ứng Cử</h2>
+                        
+                        <form id="candidateForm" class="form">
+                            <div class="form-group">
+                                <label for="candidateName">Họ và tên:</label>
+                                <input type="text" id="candidateName" placeholder="Nguyễn Văn A" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="candidatePosition">Vị trí ứng cử:</label>
+                                <select id="candidatePosition" required>
+                                    <option value="">-- Chọn vị trí --</option>
+                                    <option value="Lop truong">Lớp trưởng</option>
+                                    <option value="Lop pho">Lớp phó</option>
+                                    <option value="Bi thu">Bí thư</option>
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success">Đăng ký ứng cử</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Admin Tab -->
+                <div class="tab-content admin-only" id="admin">
+                    <div class="section">
+                        <h2>⚙️ Quản Trị Hệ Thống</h2>
+                        <p>Chức năng quản trị dành cho admin</p>
+                        
+                        <!-- Quản lý trạng thái bầu cử -->
+                        <div class="admin-section">
+                            <h3>📊 Điều Khiển Trạng Thái Bầu Cử</h3>
+                            <div class="admin-buttons">
+                                <button onclick="startRegistration()" class="btn btn-primary">
+                                    ▶️ Bắt đầu đăng ký ứng viên
+                                </button>
+                                <button onclick="startVoting()" class="btn btn-success">
+                                    🗳️ Bắt đầu bỏ phiếu
+                                </button>
+                                <button onclick="endElection()" class="btn btn-danger">
+                                    🏁 Kết thúc bầu cử
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Đăng ký cử tri -->
+                        <div class="admin-section">
+                            <h3>👥 Đăng Ký Cử Tri</h3>
+                            <div class="form-group">
+                                <label>Địa chỉ ví cử tri:</label>
+                                <input type="text" id="voterAddress" placeholder="0x..." class="form-control">
+                                <button onclick="registerVoter()" class="btn btn-primary" style="margin-top: 10px;">
+                                    Đăng ký cử tri
+                                </button>
+                            </div>
+                            
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label>Đăng ký nhiều cử tri (mỗi địa chỉ 1 dòng):</label>
+                                <textarea id="voterAddresses" rows="5" placeholder="0x...&#10;0x...&#10;0x..." class="form-control"></textarea>
+                                <button onclick="registerMultipleVoters()" class="btn btn-primary" style="margin-top: 10px;">
+                                    Đăng ký hàng loạt
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Thêm ứng viên -->
+                        <div class="admin-section">
+                            <h3>➕ Thêm Ứng Viên (Admin)</h3>
+                            <div class="form-group">
+                                <label>Tên ứng viên:</label>
+                                <input type="text" id="adminCandidateName" placeholder="Nguyễn Văn A" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Vị trí:</label>
+                                <select id="adminCandidatePosition" class="form-control">
+                                    <option value="Lop truong">Lớp trưởng</option>
+                                    <option value="Lop pho">Lớp phó</option>
+                                    <option value="Bi thu">Bí thư</option>
+                                </select>
+                            </div>
+                            <button onclick="addCandidateAdmin()" class="btn btn-success">
+                                Thêm ứng viên
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -265,7 +514,495 @@
         </footer>
     </div>
 
-    <script src="auth.js"></script>
-    <script src="private-voting.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script>
+        // Blockchain variables
+        let web3;
+        let contract;
+        let userAccount;
+        let isAdmin = false;
+        const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+        const CONTRACT_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"candidateId","type":"uint256"},{"indexed":false,"internalType":"string","name":"name","type":"string"},{"indexed":false,"internalType":"string","name":"position","type":"string"}],"name":"CandidateRegistered","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"enum ClassElection.ElectionState","name":"newState","type":"uint8"}],"name":"ElectionStateChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"voter","type":"address"},{"indexed":false,"internalType":"uint256","name":"candidateId","type":"uint256"}],"name":"Voted","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"voter","type":"address"}],"name":"VoterRegistered","type":"event"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_position","type":"string"}],"name":"addCandidate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"_position","type":"string"}],"name":"addPosition","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"admin","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"candidates","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"candidatesCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"endElection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getCandidates","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"internalType":"struct ClassElection.Candidate[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"getPosition","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPositionsCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getResults","outputs":[{"components":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"position","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"},{"internalType":"bool","name":"exists","type":"bool"}],"internalType":"struct ClassElection.Candidate[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getTotalVotes","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"positions","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"_name","type":"string"},{"internalType":"string","name":"_position","type":"string"}],"name":"registerCandidate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_voter","type":"address"}],"name":"registerVoter","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"_voters","type":"address[]"}],"name":"registerVoters","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"resetElection","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startRegistration","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startVoting","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"state","outputs":[{"internalType":"enum ClassElection.ElectionState","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_candidateId","type":"uint256"}],"name":"vote","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"voterAddresses","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"voters","outputs":[{"internalType":"bool","name":"isRegistered","type":"bool"},{"internalType":"bool","name":"hasVoted","type":"bool"},{"internalType":"uint256","name":"votedCandidateId","type":"uint256"},{"internalType":"bool","name":"canRegisterCandidates","type":"bool"}],"stateMutability":"view","type":"function"}];
+        
+        // Kiểm tra đăng nhập
+        function checkAuth() {
+            const currentUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+            if (!currentUser) {
+                setTimeout(() => {
+                    const stillNoUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+                    if (!stillNoUser) {
+                        window.location.href = 'login.html';
+                    }
+                }, 1000);
+                return null;
+            } else {
+                const user = JSON.parse(currentUser);
+                document.getElementById('userName').textContent = user.fullName;
+                document.getElementById('userRole').textContent = user.role === 'admin' ? 'Quản trị viên' : 'Sinh viên - ' + user.studentId;
+                
+                // Show/hide admin tabs
+                if (user.role === 'admin') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+                } else {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                }
+                
+                return user;
+            }
+        }
+        
+        // Kết nối MetaMask
+        async function connectWallet() {
+            console.log('connectWallet function called');
+            console.log('window.ethereum:', window.ethereum);
+            
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    alert('❌ Vui lòng cài đặt MetaMask!\n\nDownload tại: https://metamask.io');
+                    window.open('https://metamask.io/download/', '_blank');
+                    return;
+                }
+                
+                console.log('Requesting accounts...');
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userAccount = accounts[0];
+                console.log('Connected account:', userAccount);
+                
+                web3 = new Web3(window.ethereum);
+                contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                console.log('Contract initialized:', CONTRACT_ADDRESS);
+                
+                // Check if admin (with error handling)
+                try {
+                    const adminAddress = await contract.methods.admin().call();
+                    isAdmin = (userAccount.toLowerCase() === adminAddress.toLowerCase());
+                    console.log('Is admin:', isAdmin);
+                } catch (err) {
+                    console.warn('Could not check admin status:', err);
+                    isAdmin = false;
+                }
+                
+                document.getElementById('statusText').textContent = 'Đã kết nối';
+                document.getElementById('statusText').className = 'status-connected';
+                document.getElementById('accountAddress').textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+                document.getElementById('connectWallet').style.display = 'none';
+                
+                // Ẩn hướng dẫn
+                const guide = document.getElementById('connectionGuide');
+                if (guide) guide.style.display = 'none';
+                
+                alert('✅ Kết nối MetaMask thành công!');
+                
+                // Load initial data nếu đã unlock
+                if (document.getElementById('votingArea').style.display === 'block') {
+                    await loadElectionData();
+                }
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                alert('❌ Lỗi kết nối: ' + error.message);
+            }
+        }
+        
+        // Load dữ liệu bầu cử
+        async function loadElectionData() {
+            if (!contract || !userAccount) {
+                console.warn('Contract or account not initialized');
+                return;
+            }
+            
+            try {
+                const state = await contract.methods.state().call();
+                const stateNames = ['Thiết lập', 'Đăng ký ứng viên', 'Đang bỏ phiếu', 'Đã kết thúc'];
+                const electionStateEl = document.getElementById('electionState');
+                if (electionStateEl) {
+                    electionStateEl.textContent = stateNames[state];
+                }
+                
+                const candidates = await contract.methods.getCandidates().call();
+                const candidateCountEl = document.getElementById('candidateCount');
+                if (candidateCountEl) {
+                    candidateCountEl.textContent = candidates.length;
+                }
+                
+                const totalVotes = await contract.methods.getTotalVotes().call();
+                const totalVotesEl = document.getElementById('totalVotes');
+                if (totalVotesEl) {
+                    totalVotesEl.textContent = totalVotes;
+                }
+                
+                // Check voter status
+                const voterInfo = await contract.methods.voters(userAccount).call();
+                const voterStatusEl = document.getElementById('voterStatus');
+                if (voterStatusEl) {
+                    if (!voterInfo.isRegistered) {
+                        voterStatusEl.textContent = 'Chưa đăng ký';
+                    } else if (voterInfo.hasVoted) {
+                        voterStatusEl.textContent = 'Đã bỏ phiếu';
+                    } else {
+                        voterStatusEl.textContent = 'Có thể bỏ phiếu';
+                    }
+                }
+                
+                // Load candidates
+                await loadCandidates();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                // Don't show alert to user, just log it
+            }
+        }
+        
+        // Load danh sách ứng viên
+        async function loadCandidates() {
+            if (!contract || !userAccount) {
+                console.warn('Contract or account not initialized');
+                return;
+            }
+            
+            try {
+                const candidates = await contract.methods.getCandidates().call();
+                const candidatesListDiv = document.getElementById('candidatesList');
+                
+                if (!candidatesListDiv) {
+                    console.warn('Candidates list div not found');
+                    return;
+                }
+                
+                if (candidates.length === 0) {
+                    candidatesListDiv.innerHTML = '<p class="empty-state">Chưa có ứng viên nào</p>';
+                    return;
+                }
+                
+                const voterInfo = await contract.methods.voters(userAccount).call();
+                const canVote = voterInfo.isRegistered && !voterInfo.hasVoted;
+                
+                candidatesListDiv.innerHTML = candidates.map(candidate => `
+                    <div class="candidate-card">
+                        <h3>${candidate.name}</h3>
+                        <p class="candidate-position">${candidate.position}</p>
+                        <p class="candidate-votes">${candidate.voteCount} phiếu</p>
+                        ${canVote ? `<button onclick="voteForCandidate(${candidate.id})" class="btn btn-primary">Bầu cho ứng viên này</button>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+            }
+        }
+        
+        // Bỏ phiếu
+        async function voteForCandidate(candidateId) {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            if (!confirm('Bạn có chắc muốn bỏ phiếu cho ứng viên này? Không thể thay đổi sau khi xác nhận!')) {
+                return;
+            }
+            
+            try {
+                await contract.methods.vote(candidateId).send({ from: userAccount });
+                alert('✅ Bỏ phiếu thành công!');
+                await loadElectionData();
+            } catch (error) {
+                console.error('Error voting:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Load kết quả
+        async function loadResults() {
+            if (!contract) return;
+            
+            try {
+                const results = await contract.methods.getResults().call();
+                const resultsDiv = document.getElementById('resultsList');
+                
+                if (results.length === 0) {
+                    resultsDiv.innerHTML = '<p class="empty-state">Chưa có kết quả</p>';
+                    return;
+                }
+                
+                // Sort by votes
+                const sortedResults = [...results].sort((a, b) => Number(b.voteCount) - Number(a.voteCount));
+                
+                resultsDiv.innerHTML = sortedResults.map((candidate, index) => `
+                    <div class="result-card ${index === 0 ? 'winner' : ''}">
+                        <div class="result-rank">#${index + 1}</div>
+                        <div class="result-info">
+                            <h3>${candidate.name}</h3>
+                            <p>${candidate.position}</p>
+                        </div>
+                        <div class="result-votes">
+                            <span class="vote-count">${candidate.voteCount}</span>
+                            <span class="vote-label">phiếu</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+        
+        // Đăng ký ứng cử
+        async function registerAsCandidate(e) {
+            e.preventDefault();
+            
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            const name = document.getElementById('candidateName').value.trim();
+            const position = document.getElementById('candidatePosition').value;
+            
+            if (!name || !position) {
+                alert('Vui lòng điền đầy đủ thông tin!');
+                return;
+            }
+            
+            try {
+                await contract.methods.registerCandidate(name, position).send({ from: userAccount });
+                alert('✅ Đăng ký ứng cử thành công!');
+                document.getElementById('candidateForm').reset();
+                await loadElectionData();
+                switchTab('voting');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: Start registration
+        async function startRegistration() {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            try {
+                await contract.methods.startRegistration().send({ from: userAccount });
+                alert('✅ Đã bắt đầu giai đoạn đăng ký!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: Start voting
+        async function startVoting() {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            try {
+                await contract.methods.startVoting().send({ from: userAccount });
+                alert('✅ Đã bắt đầu bỏ phiếu!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: End election
+        async function endElection() {
+            if (!contract || !userAccount) {
+                alert('Vui lòng kết nối MetaMask!');
+                return;
+            }
+            
+            if (!confirm('Bạn có chắc muốn kết thúc bầu cử?')) {
+                return;
+            }
+            
+            try {
+                await contract.methods.endElection().send({ from: userAccount });
+                alert('✅ Đã kết thúc bầu cử!');
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: Register voter
+        async function registerVoter() {
+            const address = document.getElementById('voterAddress').value.trim();
+            
+            if (!address) {
+                alert('Vui lòng nhập địa chỉ!');
+                return;
+            }
+            
+            try {
+                await contract.methods.registerVoter(address).send({ from: userAccount });
+                alert('✅ Đăng ký cử tri thành công!');
+                document.getElementById('voterAddress').value = '';
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: Register multiple voters
+        async function registerMultipleVoters() {
+            const addresses = document.getElementById('voterAddresses').value.trim().split('\n').filter(a => a.trim());
+            
+            if (addresses.length === 0) {
+                alert('Vui lòng nhập địa chỉ!');
+                return;
+            }
+            
+            try {
+                await contract.methods.registerVoters(addresses).send({ from: userAccount });
+                alert(`✅ Đã đăng ký ${addresses.length} cử tri!`);
+                document.getElementById('voterAddresses').value = '';
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Admin: Add candidate
+        async function addCandidateAdmin() {
+            const name = document.getElementById('adminCandidateName').value.trim();
+            const position = document.getElementById('adminCandidatePosition').value;
+            
+            if (!name) {
+                alert('Vui lòng nhập tên!');
+                return;
+            }
+            
+            try {
+                await contract.methods.addCandidate(name, position).send({ from: userAccount });
+                alert('✅ Đã thêm ứng viên!');
+                document.getElementById('adminCandidateName').value = '';
+                await loadElectionData();
+            } catch (error) {
+                alert('Lỗi: ' + error.message);
+            }
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Load data for specific tabs
+            if (tabName === 'results') {
+                loadResults();
+            } else if (tabName === 'voting') {
+                loadElectionData();
+            }
+        }
+        
+        // Setup
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('=== PAGE LOADED ===');
+            console.log('Web3 available:', typeof Web3);
+            console.log('MetaMask available:', typeof window.ethereum);
+            
+            const user = checkAuth();
+            
+            const connectBtn = document.getElementById('connectWallet');
+            console.log('Connect button found:', connectBtn);
+            
+            if (connectBtn) {
+                connectBtn.addEventListener('click', function() {
+                    console.log('Connect button clicked!');
+                    connectWallet();
+                });
+            } else {
+                console.error('Connect button NOT found!');
+            }
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                if (confirm('Bạn có chắc muốn đăng xuất?')) {
+                    sessionStorage.removeItem('current_user');
+                    localStorage.removeItem('current_user');
+                    window.location.href = 'login.html';
+                }
+            });
+            
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // Registration form
+            const candidateForm = document.getElementById('candidateForm');
+            if (candidateForm) {
+                candidateForm.addEventListener('submit', registerAsCandidate);
+            }
+            
+            // Refresh results button
+            const refreshBtn = document.getElementById('refreshResults');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadResults);
+            }
+            
+            // Xử lý unlock voting với mật khẩu
+            const unlockBtn = document.getElementById('unlockVoting');
+            const passwordInput = document.getElementById('electionPasswordInput');
+            
+            if (unlockBtn) {
+                unlockBtn.addEventListener('click', async function() {
+                    const password = passwordInput.value.trim();
+                    const correctPassword = '123456';
+                    
+                    if (!password) {
+                        alert('Vui lòng nhập mật khẩu!');
+                        return;
+                    }
+                    
+                    if (password === correctPassword) {
+                        // Đúng mật khẩu - mở khóa
+                        document.getElementById('lockScreen').style.display = 'none';
+                        document.getElementById('votingArea').style.display = 'block';
+                        document.getElementById('votingArea').classList.add('unlocked');
+                        
+                        // Ẩn hướng dẫn kết nối
+                        const guide = document.getElementById('connectionGuide');
+                        if (guide) guide.style.display = 'none';
+                        
+                        // Nếu đã kết nối MetaMask, load data ngay
+                        if (contract) {
+                            await loadElectionData();
+                        } else {
+                            alert('⚠️ Nhớ kết nối MetaMask ở trên để sử dụng đầy đủ chức năng!');
+                        }
+                    } else {
+                        alert('❌ Mật khẩu sai! Mật khẩu đúng là: 123456');
+                        document.getElementById('passwordError').style.display = 'block';
+                        passwordInput.classList.add('error');
+                        passwordInput.value = '';
+                        
+                        setTimeout(() => {
+                            passwordInput.classList.remove('error');
+                            document.getElementById('passwordError').style.display = 'none';
+                        }, 2000);
+                    }
+                });
+                
+                // Enter để submit
+                passwordInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        unlockBtn.click();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
